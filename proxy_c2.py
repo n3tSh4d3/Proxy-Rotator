@@ -62,9 +62,27 @@ class ProxyC2:
         """Esegue webshare_fetcher per scaricare nuovi proxy"""
         self.log("Avvio fetch proxy da Webshare...", "INFO")
         
+        # Determina il path del webshare_fetcher.py
+        # Prova prima directory corrente (installazione manuale)
+        # Poi /usr/share/proxy-rotator/ (pacchetto DEB)
+        fetcher_paths = [
+            'webshare_fetcher.py',
+            '/usr/share/proxy-rotator/webshare_fetcher.py'
+        ]
+        
+        fetcher_path = None
+        for path in fetcher_paths:
+            if os.path.exists(path):
+                fetcher_path = path
+                break
+        
+        if not fetcher_path:
+            self.log("File webshare_fetcher.py non trovato!", "ERROR")
+            return False
+        
         try:
             result = subprocess.run(
-                ['python3', 'webshare_fetcher.py', '-c', self.config_file],
+                ['python3', fetcher_path, '-c', self.config_file],
                 capture_output=True,
                 text=True,
                 timeout=120
@@ -115,10 +133,26 @@ class ProxyC2:
         self.log("Avvio proxy rotator...", "INFO")
         self.log("=" * 60, "INFO")
         
+        # Determina il path del proxy_rotator.py
+        rotator_paths = [
+            'proxy_rotator.py',
+            '/usr/share/proxy-rotator/proxy_rotator.py'
+        ]
+        
+        rotator_path = None
+        for path in rotator_paths:
+            if os.path.exists(path):
+                rotator_path = path
+                break
+        
+        if not rotator_path:
+            self.log("File proxy_rotator.py non trovato!", "ERROR")
+            return False
+        
         try:
             # Avvia proxy_rotator.py con webshare - lascia stdout/stderr visibili
             self.rotator_process = subprocess.Popen(
-                ['python3', 'proxy_rotator.py', '--webshare']
+                ['python3', rotator_path, '--webshare']
             )
             
             # Attendi un po' per verificare che non crashi immediatamente
@@ -232,15 +266,7 @@ class ProxyC2:
         self.log(f"  - Config file: {self.config_file}", "INFO")
         self.log("=" * 60, "INFO")
         
-        # Verifica che i file necessari esistano
-        if not os.path.exists('webshare_fetcher.py'):
-            self.log("File webshare_fetcher.py non trovato!", "ERROR")
-            return False
-        
-        if not os.path.exists('proxy_rotator.py'):
-            self.log("File proxy_rotator.py non trovato!", "ERROR")
-            return False
-        
+        # Verifica che il file di configurazione esista
         if not os.path.exists(self.config_file):
             self.log(f"File config {self.config_file} non trovato!", "ERROR")
             return False
