@@ -1,0 +1,4 @@
+#!/bin/bash
+# Wrapper script for proxy-c2
+
+exec /usr/bin/python3 /usr/share/proxy-rotator/proxy_c2.py "$@"

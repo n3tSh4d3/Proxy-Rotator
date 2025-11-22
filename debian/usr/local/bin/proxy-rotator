@@ -1,0 +1,4 @@
+#!/bin/bash
+# Wrapper script for proxy-rotator
+
+exec /usr/bin/python3 /usr/share/proxy-rotator/proxy_rotator.py "$@"

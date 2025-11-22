@@ -1,0 +1,20 @@
+Package: proxy-rotator
+Version: 1.0.0
+Section: net
+Priority: optional
+Architecture: all
+Depends: python3 (>= 3.10), python3-requests
+Maintainer: CONDRò Adriano <condro.adriano@example.com>
+Description: Proxy Rotator with Webshare.io support
+ Complete proxy rotation system with Webshare.io support, automatic
+ management, health check and intelligent rotation.
+ .
+ Features:
+  - Automatic proxy rotation every 9 seconds
+  - Local HTTP proxy server on port 8888
+  - Webshare.io proxy support with authentication
+  - HTTPS support via CONNECT tunneling
+  - Automatic proxy validation
+  - C2 orchestrator with health check
+  - Automatic restart on crash
+Homepage: https://github.com/n3tSh4d3/Proxy-Rotator

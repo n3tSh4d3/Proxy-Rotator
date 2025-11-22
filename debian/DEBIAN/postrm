@@ -1,0 +1,30 @@
+#!/bin/bash
+set -e
+
+# Post-removal script for proxy-rotator
+
+# Ricarica systemd
+if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || true
+fi
+
+# Rimuovi directory dati solo se purge
+if [ "$1" = "purge" ]; then
+    if [ -d "/var/lib/proxy-rotator" ]; then
+        rm -rf /var/lib/proxy-rotator
+        echo "✓ Rimossa directory dati: /var/lib/proxy-rotator"
+    fi
+    
+    if [ -f "/etc/proxy-rotator/config.ini" ]; then
+        rm -f /etc/proxy-rotator/config.ini
+        echo "✓ Rimossa configurazione: /etc/proxy-rotator/config.ini"
+    fi
+    
+    if [ -d "/etc/proxy-rotator" ]; then
+        rmdir /etc/proxy-rotator 2>/dev/null || true
+    fi
+fi
+
+echo "Proxy Rotator rimosso."
+
+exit 0

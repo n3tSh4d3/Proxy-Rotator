@@ -1,0 +1,4 @@
+#!/bin/bash
+# Wrapper script for webshare-fetcher
+
+exec /usr/bin/python3 /usr/share/proxy-rotator/webshare_fetcher.py "$@"

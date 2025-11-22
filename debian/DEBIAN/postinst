@@ -1,0 +1,57 @@
+#!/bin/bash
+set -e
+
+# Post-installation script for proxy-rotator
+
+echo "Configurazione Proxy Rotator..."
+
+# Crea directory dati se non esiste
+if [ ! -d "/var/lib/proxy-rotator" ]; then
+    mkdir -p /var/lib/proxy-rotator
+    chmod 755 /var/lib/proxy-rotator
+fi
+
+# Crea config.ini se non esiste
+if [ ! -f "/etc/proxy-rotator/config.ini" ]; then
+    cp /etc/proxy-rotator/config.ini.example /etc/proxy-rotator/config.ini
+    chmod 644 /etc/proxy-rotator/config.ini
+    echo "✓ Creato file di configurazione: /etc/proxy-rotator/config.ini"
+fi
+
+# Ricarica systemd
+if [ -d /run/systemd/system ]; then
+    systemctl daemon-reload >/dev/null 2>&1 || true
+fi
+
+echo ""
+echo "============================================================"
+echo "✅ Proxy Rotator installato con successo!"
+echo "============================================================"
+echo ""
+echo "Prossimi passi:"
+echo ""
+echo "1. Configura il token Webshare:"
+echo "   sudo nano /etc/proxy-rotator/config.ini"
+echo ""
+echo "2. Avvia il servizio:"
+echo "   sudo systemctl start proxy-c2"
+echo ""
+echo "3. Abilita avvio automatico:"
+echo "   sudo systemctl enable proxy-c2"
+echo ""
+echo "4. Verifica stato:"
+echo "   sudo systemctl status proxy-c2"
+echo ""
+echo "5. Visualizza log:"
+echo "   sudo journalctl -u proxy-c2 -f"
+echo ""
+echo "Comandi disponibili:"
+echo "  - proxy-c2          (orchestratore C2)"
+echo "  - proxy-rotator     (proxy rotator)"
+echo "  - webshare-fetcher  (fetch proxy Webshare)"
+echo ""
+echo "Documentazione: https://github.com/n3tSh4d3/Proxy-Rotator"
+echo "============================================================"
+echo ""
+
+exit 0

@@ -1,0 +1,19 @@
+#!/bin/bash
+set -e
+
+# Pre-removal script for proxy-rotator
+
+# Ferma il servizio se attivo
+if [ -d /run/systemd/system ]; then
+    if systemctl is-active --quiet proxy-c2; then
+        echo "Arresto servizio proxy-c2..."
+        systemctl stop proxy-c2 >/dev/null 2>&1 || true
+    fi
+    
+    if systemctl is-enabled --quiet proxy-c2; then
+        echo "Disabilitazione servizio proxy-c2..."
+        systemctl disable proxy-c2 >/dev/null 2>&1 || true
+    fi
+fi
+
+exit 0

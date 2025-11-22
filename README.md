@@ -70,14 +70,20 @@ Sistema completo di proxy rotation con supporto per proxy Webshare.io, gestione 
 
 ## 🔧 Installazione
 
-### 1️⃣ Clona il Repository
+Ci sono **due metodi** per installare Proxy Rotator:
+
+### Metodo 1: Installazione Manuale (Consigliato per Sviluppatori)
+
+Ideale per sviluppo, testing e personalizzazione.
+
+#### 1️⃣ Clona il Repository
 
 ```bash
 git clone https://github.com/n3tSh4d3/Proxy-Rotator.git
 cd Proxy-Rotator
 ```
 
-### 2️⃣ Installa Dipendenze Python
+#### 2️⃣ Installa Dipendenze Python
 
 ```bash
 # Aggiorna pip
@@ -87,7 +93,7 @@ python3 -m pip install --upgrade pip
 pip3 install requests
 ```
 
-### 3️⃣ Verifica Installazione
+#### 3️⃣ Verifica Installazione
 
 ```bash
 # Verifica Python
@@ -97,7 +103,7 @@ python3 --version  # Deve essere >= 3.10
 python3 -c "import requests; print(requests.__version__)"
 ```
 
-### 4️⃣ Rendi Eseguibili gli Script
+#### 4️⃣ Rendi Eseguibili gli Script
 
 ```bash
 chmod +x proxy_c2.py
@@ -107,16 +113,185 @@ chmod +x webshare_fetcher.py
 
 ---
 
+### Metodo 2: Pacchetto DEB (Consigliato per Produzione)
+
+Installazione professionale con servizio systemd automatico.
+
+#### 📥 Opzione A: Download Release
+
+```bash
+# Download pacchetto .deb da GitHub Releases
+wget https://github.com/n3tSh4d3/Proxy-Rotator/releases/download/v1.0.0/proxy-rotator_1.0.0_all.deb
+
+# Installazione
+sudo dpkg -i proxy-rotator_1.0.0_all.deb
+sudo apt install -f  # Risolve dipendenze automaticamente
+```
+
+#### 🔨 Opzione B: Build da Sorgente
+
+```bash
+# Clona repository
+git clone https://github.com/n3tSh4d3/Proxy-Rotator.git
+cd Proxy-Rotator
+
+# Build pacchetto DEB
+./build-deb.sh
+
+# Installazione
+sudo dpkg -i dist/proxy-rotator_1.0.0_all.deb
+sudo apt install -f
+```
+
+#### ⚙️ Configurazione Post-Installazione
+
+```bash
+# 1. Configura token Webshare
+sudo nano /etc/proxy-rotator/config.ini
+# Inserisci il tuo token Webshare
+
+# 2. Avvia servizio
+sudo systemctl start proxy-c2
+
+# 3. Abilita avvio automatico
+sudo systemctl enable proxy-c2
+
+# 4. Verifica stato
+sudo systemctl status proxy-c2
+
+# 5. Visualizza log
+sudo journalctl -u proxy-c2 -f
+```
+
+#### 📦 Comandi Disponibili (Solo Pacchetto DEB)
+
+Dopo l'installazione del pacchetto DEB, avrai accesso a comandi globali:
+
+```bash
+# Orchestratore C2
+proxy-c2 --help
+
+# Proxy rotator standalone
+proxy-rotator --help
+
+# Fetcher Webshare
+webshare-fetcher --help
+```
+
+#### 🗑️ Disinstallazione Pacchetto DEB
+
+```bash
+# Rimozione pacchetto (mantiene configurazione)
+sudo apt remove proxy-rotator
+
+# Rimozione completa (inclusa configurazione)
+sudo apt purge proxy-rotator
+```
+
+---
+
+### 📊 Confronto Metodi
+
+| Caratteristica | Manuale | Pacchetto DEB |
+|----------------|---------|---------------|
+| **Installazione** | Manuale | Automatica |
+| **Dipendenze** | Manuale | Automatiche (APT) |
+| **Servizio systemd** | Manuale | Automatico |
+| **Comandi globali** | ❌ | ✅ |
+| **Avvio automatico** | Configurazione manuale | Integrato |
+| **Aggiornamenti** | Git pull | `apt upgrade` |
+| **Ideale per** | Sviluppo/Testing | Produzione |
+
+
+
 ## ⚙️ Configurazione
 
-### 1️⃣ Configura Webshare.io
+La configurazione varia in base al metodo di installazione utilizzato.
 
-Modifica `config.ini` con il tuo token Webshare:
+### 🔑 Ottenere il Token Webshare
+
+Prima di configurare, ottieni il tuo token API:
+
+1. **Vai su**: https://proxy.webshare.io/userapi/
+2. **Login** al tuo account Webshare
+3. **Copia il token** dalla sezione "API Key"
+4. **Conserva il token** - lo userai nella configurazione
+
+---
+
+### Metodo 1: Configurazione Installazione Manuale
+
+Se hai installato manualmente (senza pacchetto DEB):
+
+#### 1️⃣ Modifica config.ini
+
+```bash
+# Apri il file di configurazione nella directory del progetto
+nano config.ini
+```
+
+#### 2️⃣ Inserisci il Token
+
+Modifica il file con il tuo token Webshare:
 
 ```ini
 [webshare]
-# Ottieni il token da: https://proxy.webshare.io/userapi/
-token = IL_TUO_TOKEN_QUI
+# Sostituisci con il tuo token da https://proxy.webshare.io/userapi/
+token = p36pkcv7xd4j191u5stkb1jj01uuruirium56rkp
+
+# Modalità: 'direct' o 'backbone'
+mode = direct
+
+# Numero di proxy per pagina (max 100)
+page_size = 100
+
+# Ritardo tra richieste API (secondi)
+delay_between_requests = 0.4
+
+# ID del piano (opzionale, lascia vuoto se non necessario)
+plan_id = 
+
+[general]
+# File di output per i proxy Webshare
+webshare_out = proxy_list.txt
+
+# Cancella il file alla chiusura del programma
+cleanup_on_exit = true
+```
+
+Salva con `CTRL+O`, `INVIO`, esci con `CTRL+X`.
+
+#### 3️⃣ Verifica Configurazione
+
+```bash
+# Test fetch proxy
+python3 webshare_fetcher.py
+
+# Dovresti vedere:
+# ✓ Salvati 500 proxy in proxy_list.txt
+```
+
+---
+
+### Metodo 2: Configurazione Pacchetto DEB
+
+Se hai installato tramite pacchetto DEB:
+
+#### 1️⃣ Modifica File di Configurazione Sistema
+
+```bash
+# Il file di configurazione è in /etc/proxy-rotator/
+sudo nano /etc/proxy-rotator/config.ini
+```
+
+#### 2️⃣ Inserisci il Token
+
+Modifica il file con il tuo token Webshare:
+
+```ini
+[webshare]
+# Sostituisci con il tuo token da https://proxy.webshare.io/userapi/
+token = p36pkcv7xd4j191u5stkb1jj01uuruirium56rkp
 
 # Modalità: 'direct' o 'backbone'
 mode = direct
@@ -131,24 +306,99 @@ delay_between_requests = 0.4
 plan_id = 
 
 [general]
-# File di output per i proxy Webshare
-webshare_out = proxy_list.txt
+# File di output per i proxy Webshare (directory sistema)
+webshare_out = /var/lib/proxy-rotator/proxy_list.txt
 
 # Cancella il file alla chiusura del programma
 cleanup_on_exit = true
 ```
 
-### 2️⃣ Verifica Configurazione
+Salva con `CTRL+O`, `INVIO`, esci con `CTRL+X`.
+
+#### 3️⃣ Riavvia il Servizio
 
 ```bash
-# Test fetch proxy
-python3 webshare_fetcher.py
+# Riavvia il servizio per applicare le modifiche
+sudo systemctl restart proxy-c2
+
+# Verifica che sia attivo
+sudo systemctl status proxy-c2
+```
+
+#### 4️⃣ Verifica Configurazione
+
+```bash
+# Visualizza log in tempo reale
+sudo journalctl -u proxy-c2 -f
 
 # Dovresti vedere:
-# ✓ Salvati 500 proxy in proxy_list.txt
+# 🌐 Scaricamento proxy da Webshare.io...
+# ✓ Salvati 500 proxy in /var/lib/proxy-rotator/proxy_list.txt
 ```
 
 ---
+
+### 🔐 Sicurezza Token
+
+> [!WARNING]
+> **Il token Webshare è sensibile!**
+> - Non condividerlo pubblicamente
+> - Non committarlo su Git
+> - Non pubblicarlo su GitHub
+
+Se usi Git con installazione manuale:
+
+```bash
+# Assicurati che config.ini sia in .gitignore
+echo "config.ini" >> .gitignore
+```
+
+---
+
+### 📋 Parametri Configurazione
+
+| Parametro | Valori | Descrizione |
+|-----------|--------|-------------|
+| `token` | Stringa | Token API Webshare (obbligatorio) |
+| `mode` | `direct` / `backbone` | Tipo di proxy Webshare |
+| `page_size` | 1-100 | Proxy per pagina API |
+| `delay_between_requests` | Secondi | Ritardo tra richieste API |
+| `plan_id` | Numero | ID piano Webshare (opzionale) |
+| `webshare_out` | Path | File output proxy |
+| `cleanup_on_exit` | `true` / `false` | Cancella file alla chiusura |
+
+---
+
+### ❓ Troubleshooting Configurazione
+
+#### Errore: "token' nella sezione [webshare]"
+
+**Problema**: Token non configurato o file config.ini mancante
+
+**Soluzione**:
+- **Manuale**: Verifica che `config.ini` esista nella directory del progetto
+- **DEB**: Verifica che `/etc/proxy-rotator/config.ini` esista
+
+#### Errore: "HTTP 401 Unauthorized"
+
+**Problema**: Token non valido o scaduto
+
+**Soluzione**:
+1. Verifica il token su https://proxy.webshare.io/userapi/
+2. Copia il token corretto
+3. Aggiorna `config.ini`
+4. Riavvia il servizio (se DEB)
+
+#### Errore: "HTTP 400 Bad Request"
+
+**Problema**: Parametri configurazione errati
+
+**Soluzione**:
+- Verifica che `mode` sia `direct` o `backbone`
+- Verifica che `page_size` sia tra 1 e 100
+- Rimuovi spazi extra nel file config
+
+
 
 ## 🚀 Utilizzo
 
