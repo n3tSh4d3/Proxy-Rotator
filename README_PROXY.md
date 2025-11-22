@@ -239,7 +239,180 @@ python3 proxy_rotator.py --webshare --interval 5 --port 8080
 
 ---
 
-## 🔌 Integrazione con ZAP/Burp Suite
+## � Avvio Automatico come Servizio (systemd)
+
+Per eseguire il Proxy C2 come servizio di sistema che si avvia automaticamente all'avvio di Ubuntu:
+
+### 1️⃣ Crea il File di Servizio
+
+Crea il file `/etc/systemd/system/proxy-c2.service`:
+
+```bash
+sudo nano /etc/systemd/system/proxy-c2.service
+```
+
+Inserisci il seguente contenuto (sostituisci `YOUR_USERNAME` con il tuo username):
+
+```ini
+[Unit]
+Description=Proxy C2 - Webshare Proxy Rotator
+After=network.target
+
+[Service]
+Type=simple
+User=YOUR_USERNAME
+WorkingDirectory=/home/YOUR_USERNAME/Documents/antigravity_project/project1
+ExecStart=/usr/bin/python3 /home/YOUR_USERNAME/Documents/antigravity_project/project1/proxy_c2.py --fetch-interval 3600 --health-interval 60
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Variabili ambiente (opzionale)
+Environment="PYTHONUNBUFFERED=1"
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### 2️⃣ Configura i Permessi
+
+```bash
+# Imposta permessi corretti
+sudo chmod 644 /etc/systemd/system/proxy-c2.service
+
+# Ricarica systemd
+sudo systemctl daemon-reload
+```
+
+### 3️⃣ Gestione del Servizio
+
+```bash
+# Avvia il servizio
+sudo systemctl start proxy-c2
+
+# Ferma il servizio
+sudo systemctl stop proxy-c2
+
+# Riavvia il servizio
+sudo systemctl restart proxy-c2
+
+# Abilita avvio automatico all'avvio del sistema
+sudo systemctl enable proxy-c2
+
+# Disabilita avvio automatico
+sudo systemctl disable proxy-c2
+
+# Verifica stato del servizio
+sudo systemctl status proxy-c2
+```
+
+### 4️⃣ Visualizza i Log
+
+```bash
+# Log in tempo reale
+sudo journalctl -u proxy-c2 -f
+
+# Ultimi 100 log
+sudo journalctl -u proxy-c2 -n 100
+
+# Log di oggi
+sudo journalctl -u proxy-c2 --since today
+
+# Log con timestamp
+sudo journalctl -u proxy-c2 --since "2025-11-22 10:00:00"
+```
+
+### 5️⃣ Verifica Funzionamento
+
+```bash
+# Verifica che il servizio sia attivo
+sudo systemctl is-active proxy-c2
+
+# Verifica che il proxy risponda
+curl -x http://127.0.0.1:8888 http://httpbin.org/ip
+
+# Verifica processi
+ps aux | grep proxy
+```
+
+### 📝 Personalizzazione Parametri
+
+Modifica la riga `ExecStart` nel file di servizio per cambiare i parametri:
+
+```ini
+# Fetch ogni 30 minuti
+ExecStart=/usr/bin/python3 ... --fetch-interval 1800
+
+# Porta personalizzata
+ExecStart=/usr/bin/python3 ... --port 9999
+
+# Config personalizzato
+ExecStart=/usr/bin/python3 ... --config /path/to/config.ini
+```
+
+Dopo ogni modifica:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart proxy-c2
+```
+
+### 🔍 Troubleshooting Servizio
+
+#### Servizio non si avvia
+
+```bash
+# Controlla errori
+sudo systemctl status proxy-c2
+sudo journalctl -u proxy-c2 -n 50
+
+# Verifica permessi
+ls -la /home/YOUR_USERNAME/Documents/antigravity_project/project1/
+
+# Testa manualmente
+cd /home/YOUR_USERNAME/Documents/antigravity_project/project1/
+python3 proxy_c2.py
+```
+
+#### Servizio si riavvia continuamente
+
+```bash
+# Controlla log per errori
+sudo journalctl -u proxy-c2 -f
+
+# Verifica config.ini
+cat config.ini
+
+# Verifica dipendenze
+pip3 list | grep requests
+```
+
+### ⚙️ Configurazione Avanzata
+
+Per maggiore affidabilità, aggiungi al file di servizio:
+
+```ini
+[Service]
+# ... altre configurazioni ...
+
+# Riavvio automatico con backoff
+Restart=always
+RestartSec=10
+StartLimitInterval=200
+StartLimitBurst=5
+
+# Timeout
+TimeoutStartSec=60
+TimeoutStopSec=30
+
+# Risorse (opzionale)
+MemoryLimit=512M
+CPUQuota=50%
+```
+
+---
+
+## �🔌 Integrazione con ZAP/Burp Suite
 
 ### Configurazione OWASP ZAP
 
