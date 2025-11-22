@@ -237,7 +237,7 @@ Modifica il file con il tuo token Webshare:
 ```ini
 [webshare]
 # Sostituisci con il tuo token da https://proxy.webshare.io/userapi/
-token = p36pkcv7xd4j191u5stkb1jj01uuruirium56rkp
+token = [ inserisci il token webshare]
 
 # Modalità: 'direct' o 'backbone'
 mode = direct
