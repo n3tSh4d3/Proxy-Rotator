@@ -257,8 +257,27 @@ class ProxyRotator:
         try:
             from webshare_fetcher import fetch_webshare_proxies
             
+            # Determina il path del config.ini
+            # Prova prima directory corrente (installazione manuale)
+            # Poi /etc/proxy-rotator/ (pacchetto DEB)
+            config_paths = [
+                self.webshare_config,
+                '/etc/proxy-rotator/config.ini'
+            ]
+            
+            config_path = None
+            for path in config_paths:
+                if os.path.exists(path):
+                    config_path = path
+                    break
+            
+            if not config_path:
+                print(f"❌ File di configurazione non trovato: {self.webshare_config}")
+                print("⚠️  Nessun proxy Webshare scaricato, uso lista esistente")
+                return
+            
             print("\n🌐 Scaricamento proxy da Webshare.io...")
-            count = fetch_webshare_proxies(self.webshare_config, self.proxy_list_file)
+            count = fetch_webshare_proxies(config_path, self.proxy_list_file)
             
             if count > 0:
                 print(f"✓ {count} proxy Webshare pronti all'uso")

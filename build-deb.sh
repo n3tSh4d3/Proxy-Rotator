@@ -20,7 +20,7 @@ echo ""
 
 # Variabili
 PACKAGE_NAME="proxy-rotator"
-VERSION="1.0.0"
+VERSION="1.0.1"
 ARCH="all"
 DEB_FILE="${PACKAGE_NAME}_${VERSION}_${ARCH}.deb"
 BUILD_DIR="debian"
